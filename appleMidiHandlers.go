@@ -43,5 +43,7 @@ func HandleInvitation(dataBuf *bytes.Buffer) (session AppleMidiSession) {
 		panic(err)
 	}
 
+	session.MidiAck = make(chan uint16)
+
 	return session
 }

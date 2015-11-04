@@ -58,12 +58,18 @@ func StartAppleMidi() {
 
 		} else if command == 0x5253 { // 'RS'
 			log.Println("RS packet")
+			session, ok := appleSessions[string(dataBuf.Next(4))]
+			if ok {
+				session.MidiAck <- binary.BigEndian.Uint16(dataBuf.Next(2))
+
+			}
 		} else if command == 0x4259 { // 'BY'
 			log.Println("BY packet")
 			initToken := dataBuf.Next(4)[:]
 			senderSSRC := string(dataBuf.Next(4))
-			if bytes.Equal(appleSessions[string(senderSSRC)].InitToken, initToken) {
-				delete(appleSessions, string(senderSSRC))
+			if bytes.Equal(appleSessions[senderSSRC].InitToken, initToken) {
+				close(appleSessions[senderSSRC].MidiAck)
+				delete(appleSessions, senderSSRC)
 			} else {
 				log.Println("OI! Someone else tried to disconnect us! Assholes...")
 			}
