@@ -1,11 +1,11 @@
 package main
 
 type AppleMidiSession struct {
-	initToken  []byte
-	localSSRC  []byte
-	remoteSSRC []byte
-	localName  string
-	remoteName string
+	InitToken  []byte
+	LocalSSRC  []byte
+	RemoteSSRC []byte
+	LocalName  string
+	RemoteName string
 }
 
 type AppleMidiSessions map[string]AppleMidiSession

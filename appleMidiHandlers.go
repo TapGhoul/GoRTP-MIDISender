@@ -29,19 +29,19 @@ func CheckApplePacketValid(pBuf []byte, totalBytes int) (dataBuf *bytes.Buffer, 
 func HandleInvitation(dataBuf *bytes.Buffer) (session AppleMidiSession) {
 	var err error
 
-	session.initToken = dataBuf.Next(4)[:]
-	session.localSSRC = make([]byte, 4)
-	session.remoteSSRC = dataBuf.Next(4)[:]
-	session.localName = "PicartoTVPikachu"
-	session.remoteName, err = dataBuf.ReadString(0)
+	session.InitToken = dataBuf.Next(4)[:]
+	session.LocalSSRC = make([]byte, 4)
+	session.RemoteSSRC = dataBuf.Next(4)[:]
+	session.LocalName = "PicartoTVPikachu"
+	session.RemoteName, err = dataBuf.ReadString(0)
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = rand.Read(session.localSSRC)
+	_, err = rand.Read(session.LocalSSRC)
 	if err != nil {
 		panic(err)
 	}
 
-	return
+	return session
 }

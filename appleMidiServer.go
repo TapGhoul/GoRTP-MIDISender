@@ -41,15 +41,15 @@ func StartAppleMidi() {
 		if command == 0x494e { // 'IN'
 			log.Println("IN packet")
 			session := HandleInvitation(dataBuf)
-			appleSessions[string(session.remoteSSRC)] = session
+			appleSessions[string(session.RemoteSSRC)] = session
 
 			var payload bytes.Buffer
 
 			payload.Write([]byte{0xff, 0xff, 0x4f, 0x4b})
 			binary.Write(&payload, binary.BigEndian, uint32(2))
-			payload.Write(session.initToken)
-			payload.Write(session.localSSRC)
-			payload.WriteString(session.localName)
+			payload.Write(session.InitToken)
+			payload.Write(session.LocalSSRC)
+			payload.WriteString(session.LocalName)
 			payload.WriteByte(0x00)
 
 			_, err = controlSrv.WriteToUDP(payload.Bytes(), remoteAddr)
@@ -62,7 +62,7 @@ func StartAppleMidi() {
 			log.Println("BY packet")
 			initToken := dataBuf.Next(4)[:]
 			senderSSRC := string(dataBuf.Next(4))
-			if bytes.Equal(appleSessions[string(senderSSRC)].initToken, initToken) {
+			if bytes.Equal(appleSessions[string(senderSSRC)].InitToken, initToken) {
 				delete(appleSessions, string(senderSSRC))
 			} else {
 				log.Println("OI! Someone else tried to disconnect us! Assholes...")
