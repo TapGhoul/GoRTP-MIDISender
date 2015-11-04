@@ -8,6 +8,7 @@ import (
 )
 
 var controlSrv *net.UDPConn
+var appleSessions AppleMidiSessions
 
 func StartAppleMidi() {
 	netAddr, err := net.ResolveUDPAddr("udp", ":5004")
@@ -18,6 +19,8 @@ func StartAppleMidi() {
 	if err != nil {
 		panic(err)
 	}
+
+	appleSessions = make(AppleMidiSessions)
 
 	for {
 		pBuf := make([]byte, 64)
@@ -38,6 +41,8 @@ func StartAppleMidi() {
 		if command == 0x494e { // 'IN'
 			log.Println("IN packet")
 			session := HandleInvitation(dataBuf)
+			appleSessions[string(session.remoteSSRC)] = session
+
 			var payload bytes.Buffer
 
 			payload.Write([]byte{0xff, 0xff, 0x4f, 0x4b})
@@ -55,6 +60,13 @@ func StartAppleMidi() {
 			log.Println("RS packet")
 		} else if command == 0x4259 { // 'BY'
 			log.Println("BY packet")
+			initToken := dataBuf.Next(4)[:]
+			senderSSRC := string(dataBuf.Next(4))
+			if bytes.Equal(appleSessions[string(senderSSRC)].initToken, initToken) {
+				delete(appleSessions, string(senderSSRC))
+			} else {
+				log.Println("OI! Someone else tried to disconnect us! Assholes...")
+			}
 		} else {
 			log.Println("?? packet")
 		}

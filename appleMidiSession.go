@@ -7,3 +7,5 @@ type AppleMidiSession struct {
 	localName  string
 	remoteName string
 }
+
+type AppleMidiSessions map[string]AppleMidiSession
